@@ -12,6 +12,7 @@ import jax.random as rand
 from .ModelConfig import ModelConfig
 from .kv_cache import KVCache
 from .rotary_embedding import RotaryValues, forward_rotary_embedding
+from typing import Tuple
 
 class Attention(NamedTuple):
     query_key_value: Array
