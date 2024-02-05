@@ -2,6 +2,7 @@ from jax import Array
 import jax.numpy as jnp
 import optax
 
+# Taken entirely from ayaka's repo
 def cross_entropy_loss(logits: Array, labels: Array, *, mask: Array) -> Array:
     '''
     Computes the mean softmax cross entropy loss for the provided logits and labels, only considering elements where the mask is True.
