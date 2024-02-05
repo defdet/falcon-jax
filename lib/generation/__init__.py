@@ -9,13 +9,13 @@ import jax.random as rand
 from transformers import LlamaTokenizer
 from typing import Callable
 
-from lib.llama import KVCache, Llama, RotaryValues, forward_llama_model, get_rotary_values_at_position, make_rotary_values, model_config_llama2_7B, shift_left_kv_cache
+from lib.falcon import KVCache, Falcon, RotaryValues, forward_falcon_model, get_rotary_values_at_position, make_rotary_values, model_config_falcon_7B, shift_left_kv_cache
 
-# Taken entirely from https://github.com/ayaka14732/llama-2-jax/tree/main/lib/generation
+# Taken entirely from https://github.com/ayaka14732/falcon-2-jax/tree/main/lib/generation
 @partial(jax.jit, static_argnames=('logits_processor',))
-def _generate_first(params: Llama, seq: Array, attn_mask: Array, logits_processor: Callable, *, rotary_values: RotaryValues, key: Array) -> tuple[Array, Array, Array, KVCache]:
+def _generate_first(params: Falcon, seq: Array, attn_mask: Array, logits_processor: Callable, *, rotary_values: RotaryValues, key: Array) -> tuple[Array, Array, Array, KVCache]:
     qk_mask = op.rearrange(jnp.tril(op.einsum(attn_mask, attn_mask, 'B L1, B L2 -> B L1 L2')), 'B L1 L2 -> B 1 L1 L2')  # causal QK mask
-    outputs, kv_cache = forward_llama_model(params.model, seq, qk_mask, rotary_values=rotary_values, model_config=model_config_falcon_7B._replace(return_kv_cache=True))
+    outputs, kv_cache = forward_falcon_model(params.model, seq, qk_mask, rotary_values=rotary_values, model_config=model_config_falcon_7B._replace(return_kv_cache=True))
 
     logits = outputs[:, -1] @ params.lm_head
     selected_token_ids = logits_processor(logits, seq=seq, attn_mask=attn_mask, key=key)
@@ -37,7 +37,7 @@ class GenerationState(NamedTuple):
     key: Array
 
 @partial(jax.jit, static_argnames=('logits_processor',))
-def _generate_rest(params: Llama, seq: Array, attn_mask: Array, selected_token_ids: Array, max_n_iters: Array, logits_processor: Callable, *, rotary_values: RotaryValues, kv_cache: KVCache, key: Array) -> Array:
+def _generate_rest(params: Falcon, seq: Array, attn_mask: Array, selected_token_ids: Array, max_n_iters: Array, logits_processor: Callable, *, rotary_values: RotaryValues, kv_cache: KVCache, key: Array) -> Array:
     def cond_fun(state: GenerationState) -> Array:
         return state.max_n_iters.astype(jnp.bool_)
 
@@ -47,7 +47,7 @@ def _generate_rest(params: Llama, seq: Array, attn_mask: Array, selected_token_i
         seq_ = op.rearrange(selected_token_ids, 'B -> B 1')
         qk_mask = op.rearrange(attn_mask, 'B L -> B 1 1 L')
         rotary_values_ = get_rotary_values_at_position(rotary_values, rotary_values_position)
-        outputs, kv_cache = forward_llama_model(params.model, seq_, qk_mask, rotary_values=rotary_values_, kv_cache=kv_cache, model_config=model_config_llama2_7B._replace(return_kv_cache=True))
+        outputs, kv_cache = forward_falcon_model(params.model, seq_, qk_mask, rotary_values=rotary_values_, kv_cache=kv_cache, model_config=model_config_falcon_7B._replace(return_kv_cache=True))
 
         logits = outputs[:, -1] @ params.lm_head
         key, subkey = rand.split(key)
@@ -68,7 +68,7 @@ def _generate_rest(params: Llama, seq: Array, attn_mask: Array, selected_token_i
     final_state = jax.lax.while_loop(cond_fun, body_fun, initial_state)
     return final_state.seq
 
-def generate(sentences: list[str], tokenizer: LlamaTokenizer, params: Llama, logits_processor: Callable, *, max_len: int, key: Array) -> list[str]:
+def generate(sentences: list[str], tokenizer: FalconTokenizer, params: Falcon, logits_processor: Callable, *, max_len: int, key: Array) -> list[str]:
     batch_size = len(sentences)
 
     inputs = tokenizer(sentences, padding='max_length', truncation=True, max_length=max_len, return_tensors='jax')
@@ -77,7 +77,7 @@ def generate(sentences: list[str], tokenizer: LlamaTokenizer, params: Llama, log
     assert not attn_mask.all(axis=-1).any(), 'No room for generation since the length of a sentence is greater than `max_length`.'
 
     leftpad_len = attn_mask.argmax(axis=-1).astype(jnp.uint16)
-    rotary_values = make_rotary_values(leftpad_len, batch_size, max_len, model_config=model_config_llama2_7B)
+    rotary_values = make_rotary_values(leftpad_len, batch_size, max_len, model_config=model_config_falcon_7B)
 
     key, subkey = rand.split(key)
     seq, attn_mask, selected_token_ids, kv_cache = _generate_first(params, seq, attn_mask, logits_processor, rotary_values=rotary_values, key=subkey)
