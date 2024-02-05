@@ -5,6 +5,7 @@ from jax import Array
 import jax.random as rand
 
 from .ModelConfig import ModelConfig
+
 # Entirely taken from https://github.com/ayaka14732/llama-2-jax/blob/main/lib/llama/dropout.py
 @partial(jax.jit, static_argnames=('model_config',))
 def forward_dropout(x: Array, *, key: Array | None=None, model_config: ModelConfig) -> Array:
