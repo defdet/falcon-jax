@@ -8,6 +8,7 @@ import jax.numpy as jnp
 import jax.random as rand
 
 from ..rand_utils import split_key_nullable
+# Taken entirely from ayaka's repo
 
 # TODO: need type checking?
 # _, seq_len = seq.shape
