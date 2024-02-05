@@ -5,6 +5,7 @@ import jax.random as rand
 
 from .ModelConfig import ModelConfig
 
+https://github.com/ayaka14732/llama-2-jax/blob/main/lib/llama/embedding.py
 def check_embedding(params: Array, *, model_config: ModelConfig) -> None:
     assert isinstance(params, Array)
     assert params.shape == (model_config.vocab_size, model_config.d_model)
