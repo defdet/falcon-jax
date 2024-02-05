@@ -8,7 +8,7 @@ The project is inspired by https://github.com/ayaka14732/llama-2-jax. A very lar
 - [x] Training
     - [x] Parameter freezing
 - [ ] Generation
-    - [x] Early stopping
+    - [ ] Early stopping
 
 
 ## How to use
