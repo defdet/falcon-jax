@@ -10,6 +10,7 @@ from transformers import LlamaTokenizer
 from typing import Callable
 
 from lib.llama import KVCache, Llama, RotaryValues, forward_llama_model, get_rotary_values_at_position, make_rotary_values, model_config_llama2_7B, shift_left_kv_cache
+
 # Taken entirely from https://github.com/ayaka14732/llama-2-jax/tree/main/lib/generation
 @partial(jax.jit, static_argnames=('logits_processor',))
 def _generate_first(params: Llama, seq: Array, attn_mask: Array, logits_processor: Callable, *, rotary_values: RotaryValues, key: Array) -> tuple[Array, Array, Array, KVCache]:
