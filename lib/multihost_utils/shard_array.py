@@ -5,6 +5,7 @@ from jax import Array
 from jax.sharding import Mesh, NamedSharding, PartitionSpec as P
 import numpy as np
 
+# Taken entirely from ayaka's repo
 def shard_array(arr: Array, axis: int | EllipsisType) -> Array:
     shape = arr.shape
     devices: np.ndarray = np.array(jax.devices())
