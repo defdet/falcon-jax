@@ -68,7 +68,7 @@ def _generate_rest(params: Falcon, seq: Array, attn_mask: Array, selected_token_
     final_state = jax.lax.while_loop(cond_fun, body_fun, initial_state)
     return final_state.seq
 
-def generate(sentences: list[str], tokenizer: FalconTokenizer, params: Falcon, logits_processor: Callable, *, max_len: int, key: Array) -> list[str]:
+def generate(sentences: list[str], tokenizer: LlamaTokenizer, params: Falcon, logits_processor: Callable, *, max_len: int, key: Array) -> list[str]:
     batch_size = len(sentences)
 
     inputs = tokenizer(sentences, padding='max_length', truncation=True, max_length=max_len, return_tensors='jax')
