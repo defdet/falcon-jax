@@ -12,30 +12,15 @@ from .embedding import check_embedding, forward_embedding, init_embedding
 from .kv_cache import KVCache
 from .rms_norm import check_rms_norm, forward_rms_norm, init_rms_norm
 from .rotary_embedding import RotaryValues
+from .layer_norm import LayerNorm
 
-class LlamaModel(NamedTuple):
+class FalconModel(NamedTuple):
     embedding: Any  # Array
     decoder: Decoder
-    norm: Any  # Array
-
-def check_llama_model(params: LlamaModel, *, model_config: ModelConfig) -> None:
-    assert isinstance(params.embedding, Array)
-    assert isinstance(params.decoder, Decoder)
-    assert isinstance(params.norm, Array)
-
-    check_embedding(params.embedding, model_config=model_config)
-    check_decoder(params.decoder, model_config=model_config)
-    check_rms_norm(params.norm, model_config=model_config)
-
-def init_llama_model(*, key: Array, model_config: ModelConfig) -> LlamaModel:
-    key0, key1 = rand.split(key)
-    embedding = init_embedding(key=key0, model_config=model_config)
-    decoder = init_decoder(key=key1, model_config=model_config)
-    norm = init_rms_norm(model_config=model_config)
-    return LlamaModel(embedding, decoder, norm)
+    norm: LayerNorm  # Array
 
 @partial(jax.jit, static_argnames=('model_config'))
-def forward_llama_model(params: LlamaModel, seq: Array, qk_mask: Array, *, rotary_values: RotaryValues, kv_cache: KVCache | None=None, key: Array | None=None, model_config: ModelConfig) -> tuple[Array, KVCache | None]:
+def forward_falcon_model(params: FalconModel, seq: Array, qk_mask: Array, *, rotary_values: RotaryValues, kv_cache: KVCache | None=None, key: Array | None=None, model_config: ModelConfig) -> tuple[Array, KVCache | None]:
     assert isinstance(seq, Array)
     assert isinstance(qk_mask, Array)
     assert seq.dtype == jnp.uint16
