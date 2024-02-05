@@ -29,5 +29,5 @@ def forward_falcon_model(params: FalconModel, seq: Array, qk_mask: Array, *, rot
 
     seq = forward_embedding(params.embedding, seq)
     seq, kv_cache = forward_decoder(params.decoder, seq, qk_mask, rotary_values=rotary_values, kv_cache=kv_cache, key=key, model_config=model_config)
-    seq = forward_rms_norm(params.norm, seq, model_config=model_config)
+    seq = forward_layer_norm(params.norm, seq, model_config=model_config)
     return seq, kv_cache
