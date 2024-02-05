@@ -8,7 +8,7 @@ import jax.random as rand
 
 from ..rand_utils import split_key_nullable
 from .ModelConfig import ModelConfig
-from .attention import Attention, check_attention, forward_attention, init_attention
+from .attention import Attention, forward_attention
 from .dropout import forward_dropout
 from .kv_cache import KVCache
 from .layer_norm import LayerNorm, forward_layer_norm, 
@@ -19,8 +19,6 @@ class DecoderBlock(NamedTuple):
     attention: Attention
     dense_h_to_4h: Array
     dense_4h_to_h: Array
-
-
 
 @partial(jax.jit, static_argnames=('model_config',))
 def forward_decoder_block(params: DecoderBlock, seq: Array, qk_mask: Array, *, rotary_values: RotaryValues, kv_cache: KVCache | None=None, key: Array | None=None, model_config: ModelConfig) -> tuple[Array, KVCache | None]:
