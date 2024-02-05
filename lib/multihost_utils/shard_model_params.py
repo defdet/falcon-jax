@@ -8,7 +8,7 @@ from .shard_array import shard_array
 sharding_mp = Falcon(
     model=FalconModel(
         embedding=...,
-        decoder=DecoderBlock(
+        decoder=Decoder(
             layer_norm=LayerNorm(input_norm=..., input_norm_bias=...),
             attention=Attention(query_key_value=2, dense=2),
             dense_h_to_4h=2,
