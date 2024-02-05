@@ -3,6 +3,7 @@ import jax
 from ..falcon import Falcon, FalconModel
 from ..falcon.attention import Attention
 from ..falcon.decoder import Decoder
+from ..falcon.layer_norm import LayerNorm
 from .shard_array import shard_array
 
 sharding_mp = Falcon(
