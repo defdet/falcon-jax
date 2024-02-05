@@ -14,7 +14,7 @@ class ModelConfig(NamedTuple):
     dropout_rate: float | None
     return_kv_cache: bool
 
-falcon_config_7b = ModelConfig(
+model_config_falcon_7B = ModelConfig(
     d_ff=18176,
     head_dim=64,
     d_model=4544,
