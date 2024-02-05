@@ -1,5 +1,6 @@
 from functools import partial
 import math
+import einops as op
 from typing import Any, NamedTuple
 
 import jax
