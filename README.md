@@ -6,6 +6,6 @@ The project is inspired by https://github.com/ayaka14732/llama-2-jax. A very lar
     - [x] [Layer Norm](lib/falcon/layer_norm.py)
     - [x] [Parallel Attention and Multi-Query Attention](lib/falcon/attention.py)
 - [x] Training
-    - [x] [Parameter freezing](lib/train.ipynb)
+    - [x] [Parameter freezing](train.ipynb)
 - [ ] Generation
     - [ ] Early stopping
