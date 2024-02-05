@@ -14,30 +14,8 @@ from .kv_cache import KVCache
 from .rotary_embedding import RotaryValues, forward_rotary_embedding
 
 class Attention(NamedTuple):
-    q_proj: Any  # Array
-    k_proj: Any  # Array
-    v_proj: Any  # Array
-    out_proj: Any  # Array
-
-def check_attention(params: Attention, *, model_config: ModelConfig) -> None:
-    assert isinstance(params.q_proj, Array)
-    assert isinstance(params.k_proj, Array)
-    assert isinstance(params.v_proj, Array)
-    assert isinstance(params.out_proj, Array)
-
-    assert params.q_proj.shape == (model_config.d_model, model_config.n_rep_kv, model_config.n_heads_kv, model_config.d_k)
-    assert params.k_proj.shape == (model_config.d_model, model_config.n_heads_kv, model_config.d_k)
-    assert params.v_proj.shape == (model_config.d_model, model_config.n_heads_kv, model_config.d_v)
-    assert params.out_proj.shape == (model_config.n_rep_kv, model_config.n_heads_kv, model_config.d_v, model_config.d_model)
-
-def init_attention(*, key: Array, model_config: ModelConfig) -> Attention:
-    upper = 1. / math.sqrt(model_config.d_model)
-    key0, key1, key2, key3 = rand.split(key, num=4)
-    q_proj = rand.truncated_normal(key0, -upper, upper, (model_config.d_model, model_config.n_rep_kv, model_config.n_heads_kv, model_config.d_k))
-    k_proj = rand.truncated_normal(key1, -upper, upper, (model_config.d_model, model_config.n_heads_kv, model_config.d_k))
-    v_proj = rand.truncated_normal(key2, -upper, upper, (model_config.d_model, model_config.n_heads_kv, model_config.d_v))
-    out_proj = rand.truncated_normal(key3, -upper, upper, (model_config.n_rep_kv, model_config.n_heads_kv, model_config.d_v, model_config.d_model))
-    return Attention(q_proj, k_proj, v_proj, out_proj)
+    query_key_value: Array
+    dense: Array
 
 # Taken from https://github.com/huggingface/transformers/blob/main/src/transformers/models/falcon/modeling_falcon.py
 def split_heads(fused_qkv: Array, config: ModelConfig) -> Tuple[Array, Array, Array]:
@@ -76,10 +54,8 @@ def forward_attention(params: Attention, seq: Array, qk_mask: Array, rotary_valu
 
         k = k_cache.at[:, :, -1:].set(k)
         v = v_cache.at[:, :, -1:].set(v)
-        max_len = k.shape[2]
         
     qk = op.einsum(q, k.squeeze(1), 'B H S M, B D M -> B H S D')
-    qk_before_sqrt = qk.copy()
     qk /= math.sqrt(model_config.head_dim)
     qk = jnp.where(qk_mask, qk, -100000000)
     qk = nn.softmax(qk, axis=-1)  
