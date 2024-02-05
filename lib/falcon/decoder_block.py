@@ -11,7 +11,7 @@ from .ModelConfig import ModelConfig
 from .attention import Attention, forward_attention
 from .dropout import forward_dropout
 from .kv_cache import KVCache
-from .layer_norm import LayerNorm, forward_layer_norm, 
+from .layer_norm import LayerNorm, forward_layer_norm
 from .rotary_embedding import RotaryValues
 
 class DecoderBlock(NamedTuple):
