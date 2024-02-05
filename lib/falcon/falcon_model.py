@@ -24,7 +24,7 @@ def forward_falcon_model(params: FalconModel, seq: Array, qk_mask: Array, *, rot
     assert isinstance(qk_mask, Array)
     assert seq.dtype == jnp.uint16
     assert qk_mask.dtype == jnp.bool_
-    assert model_config.d_k % 2 == 0
+    assert model_config.head_dim % 2 == 0
     assert key is None or model_config.dropout_rate is not None
 
     seq = forward_embedding(params.embedding, seq)
