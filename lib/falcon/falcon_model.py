@@ -7,12 +7,11 @@ import jax.numpy as jnp
 import jax.random as rand
 
 from .ModelConfig import ModelConfig
-from .decoder import Decoder, check_decoder, forward_decoder, init_decoder
-from .embedding import check_embedding, forward_embedding, init_embedding
+from .decoder import Decoder, forward_decoder
+from .embedding import check_embedding, forward_embedding
 from .kv_cache import KVCache
-from .rms_norm import check_rms_norm, forward_rms_norm, init_rms_norm
 from .rotary_embedding import RotaryValues
-from .layer_norm import LayerNorm
+from .layer_norm import LayerNorm, forward_layer_norm
 
 class FalconModel(NamedTuple):
     embedding: Any  # Array
