@@ -1,56 +1,17 @@
-# Llama 2 JAX
+# JAX implementation of the Falcon model.
+This is an implementation of [Falcon model](https://arxiv.org/abs/2311.16867) in JAX using functional approach for improved perfomance.
+The project is inspired by https://github.com/ayaka14732/llama-2-jax. A very large amount of that project's code has been reused. Newely implemented features are:
 
-This project is the JAX implementation of [Llama 2](https://arxiv.org/abs/1910.13461). The objectives of this project are threefold:
-
-1. Implement the Llama 2 model using JAX to enable efficient training and inference on Google Cloud TPU;
-1. Develop a high-quality codebase that serves as an exemplary implementation of the Transformer model using JAX;
-1. Facilitate the identification of common errors and inconsistencies across various transformer models through the implementation of a high-quality codebase, thereby providing valuable insights for the NLP community.
-
-Related projects:
-
-- [hyunwoongko/transformer](https://github.com/hyunwoongko/transformer): PyTorch implementation of the original Transformer
-- [ayaka14732/TrAVis](https://github.com/ayaka14732/TrAVis): An in-browser Transformer attention visualiser that includes a NumPy implementation of BERT
-- [ayaka14732/bart-base-jax](https://github.com/ayaka14732/bart-base-jax): JAX implementation of BART-base
-- [ztjhz/t5-jax](https://github.com/ztjhz/t5-jax): JAX implementation of T5
-- [young-geng/EasyLM](https://github.com/young-geng/EasyLM): LLM framework that includes Flax implementations of LLaMA, GPT-J and RoBERTa
-
-This project is supported by Cloud TPUs from Google's [TPU Research Cloud](https://sites.research.google/trc/about/) (TRC).
-
-## Features
-
-- [x] [Parameter conversion](lib/llama_params/)
-    - [x] [Hugging Face to JAX](lib/llama_params/convert_params.py)
-    - [x] [JAX to Hugging Face](lib/llama_params/convert_back_params.py)
-- [x] [Data loading](lib/dataloader/LlamaDataLoader.py)
-- [x] [Model architecture](lib/llama/)
-    - [x] [Dropout](lib/llama/dropout.py)
-    - [x] [RMS Norm](lib/llama/rms_norm.py)
-    - [x] [Embedding](lib/llama/embedding.py)
-    - [x] [Rotary embedding](lib/llama/rotary_embedding.py)
-    - [x] [Attention](lib/llama/attention.py)
-    - [x] [Decoder block](lib/llama/decoder_block.py)
-    - [x] [Decoder](lib/llama/decoder.py)
-    - [x] [Llama Model](lib/llama/llama_model.py)
-    - [x] [Llama](lib/llama/llama.py)
-- [x] [Cross entropy loss](lib/loss/cross_entropy_loss.py)
+- [x] [Model architecture](lib/falcon/)
+    - [x] [Layer Norm](lib/falcon/layer_norm.py)
+    - [x] [Parallel Attention and Multi-Query Attention](lib/falcon/attention.py)
 - [x] Training
-    - [x] Data parallelism
-    - [x] [Model parallelism](lib/multihost_utils/shard_model_params.py)
-    - [ ] Other parallelisation schemes
+    - [x] Parameter freezing
 - [ ] Generation
-    - [x] [KV cache](lib/llama/kv_cache.py)
-    - [x] Left padding
-    - [x] [Presence penalty](lib/logits_processing/__init__.py)
-    - [x] Frequency penalty
-    - [ ] Beam search
-    - [ ] Beam sampling
-    - [x] Top-_k_ sampling
-    - [x] Top-_p_ sampling
-- [ ] [Documentation](.github/workflows/publish.yml)
+    - [x] Early stopping
 
-The documentation of the library of this project is published on [GitHub Pages](https://ayaka14732.github.io/llama-2-jax/).
 
-## Environment Setup
+## How to use
 
 This project requires at least Python 3.11, JAX 0.4.19, PyTorch 2.1.0, Optax 0.1.8.dev0 and Transformers 4.35.0.dev0.
 
