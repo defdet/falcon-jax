@@ -14,7 +14,7 @@ from lib.llama import KVCache, Llama, RotaryValues, forward_llama_model, get_rot
 # Taken entirely from https://github.com/ayaka14732/llama-2-jax/tree/main/lib/generation
 @partial(jax.jit, static_argnames=('logits_processor',))
 def _generate_first(params: Llama, seq: Array, attn_mask: Array, logits_processor: Callable, *, rotary_values: RotaryValues, key: Array) -> tuple[Array, Array, Array, KVCache]:
-    qk_mask = op.rearrange(jnp.tril(op.einsum(attn_mask, attn_mask, 'B L1, B L2 -> B L1 L2')), 'B L1 L2 -> B 1 1 L1 L2')  # causal QK mask
+    qk_mask = op.rearrange(jnp.tril(op.einsum(attn_mask, attn_mask, 'B L1, B L2 -> B L1 L2')), 'B L1 L2 -> B 1 L1 L2')  # causal QK mask
     outputs, kv_cache = forward_llama_model(params.model, seq, qk_mask, rotary_values=rotary_values, model_config=model_config_falcon_7B._replace(return_kv_cache=True))
 
     logits = outputs[:, -1] @ params.lm_head
@@ -45,7 +45,7 @@ def _generate_rest(params: Llama, seq: Array, attn_mask: Array, selected_token_i
         seq, attn_mask, selected_token_ids, max_n_iters, rotary_values, rotary_values_position, kv_cache, key = state
 
         seq_ = op.rearrange(selected_token_ids, 'B -> B 1')
-        qk_mask = op.rearrange(attn_mask, 'B L -> B 1 1 1 L')
+        qk_mask = op.rearrange(attn_mask, 'B L -> B 1 1 L')
         rotary_values_ = get_rotary_values_at_position(rotary_values, rotary_values_position)
         outputs, kv_cache = forward_llama_model(params.model, seq_, qk_mask, rotary_values=rotary_values_, kv_cache=kv_cache, model_config=model_config_llama2_7B._replace(return_kv_cache=True))
 
@@ -86,4 +86,4 @@ def generate(sentences: list[str], tokenizer: LlamaTokenizer, params: Llama, log
     key, subkey = rand.split(key)
     seq = _generate_rest(params, seq, attn_mask, selected_token_ids, max_n_iters, logits_processor, rotary_values=rotary_values, kv_cache=kv_cache, key=subkey)
 
-    return tokenizer.batch_decode(seq, skip_special_tokens=True)
+    return tokenizer.batch_decode(seq, skip_special_tokens=False)
